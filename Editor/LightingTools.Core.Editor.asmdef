@@ -1,0 +1,17 @@
+{
+    "name": "LightingTools.Core.Editor",
+    "references": [
+        "LightingTools.Core",
+        "Unity.RenderPipelines.HighDefinition.Runtime"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

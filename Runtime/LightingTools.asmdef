@@ -1,0 +1,11 @@
+{
+    "name": "LightingTools.Core",
+    "references": [
+    	"Unity.RenderPipelines.HighDefinition.Runtime",
+    	"Unity.RenderPipelines.Core.Runtime"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}
