@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using Object = UnityEngine.Object;
 
-namespace EditorLightUtilities
+namespace EditorLightUtilities.Serialization
 {
     public static class SerializationLightUtilities
     {
