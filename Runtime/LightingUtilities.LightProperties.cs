@@ -197,12 +197,14 @@ namespace LightUtilities
 
             light.type = lightParameters.type;
 
+#if UNITY_EDITOR
             switch (lightParameters.mode)
             {
                 case LightmapPresetBakeType.Realtime: light.lightmapBakeType = LightmapBakeType.Realtime; break;
                 case LightmapPresetBakeType.Baked: light.lightmapBakeType = LightmapBakeType.Baked; break;
                 case LightmapPresetBakeType.Mixed: light.lightmapBakeType = LightmapBakeType.Mixed; break;
             }
+#endif
             if (lightParameters.shadows)
                 light.shadows = LightShadows.Soft;
             else
