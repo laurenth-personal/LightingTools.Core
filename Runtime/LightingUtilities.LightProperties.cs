@@ -93,6 +93,7 @@ namespace LightUtilities
             temp.intensity = c.intensity;
             temp.colorFilter = c.colorFilter;
             temp.indirectIntensity = c.indirectIntensity;
+            temp.emissionRadius = c.emissionRadius;
             temp.lightAngle = c.lightAngle;
             temp.shadows = c.shadows;
             temp.shadowQuality = c.shadowQuality;
@@ -113,6 +114,10 @@ namespace LightUtilities
             temp.cullingMask = c.cullingMask;
             temp.maxSmoothness = c.maxSmoothness;
             temp.shadowResolution = c.shadowResolution;
+            temp.shadowSoftness = c.shadowSoftness;
+            temp.blockerSampleCount = c.blockerSampleCount;
+            temp.filterSampleCount = c.filterSampleCount;
+            temp.minFilterSize = c.minFilterSize;
             return temp;
         }
 
@@ -125,6 +130,7 @@ namespace LightUtilities
                 colorFilter = x.colorFilter + y.colorFilter,
                 colorTemperature = x.colorTemperature + y.colorTemperature,
                 indirectIntensity = x.indirectIntensity + y.indirectIntensity,
+                emissionRadius = x.emissionRadius + y.emissionRadius,
                 lightAngle = x.lightAngle + y.lightAngle,
                 innerSpotPercent = x.innerSpotPercent + y.innerSpotPercent,
                 maxSmoothness = x.maxSmoothness + y.maxSmoothness,
@@ -144,7 +150,11 @@ namespace LightUtilities
                 width = x.width + y.width,
                 fadeDistance = x.fadeDistance + y.fadeDistance,
                 shadowFadeDistance = x.shadowFadeDistance + y.shadowFadeDistance,
-                shadowMaxDistance = x.shadowMaxDistance + y.shadowMaxDistance
+                shadowMaxDistance = x.shadowMaxDistance + y.shadowMaxDistance,
+                shadowSoftness = x.shadowSoftness + y.shadowSoftness,
+                blockerSampleCount = x.blockerSampleCount + y.blockerSampleCount,
+                filterSampleCount = x.filterSampleCount + y.filterSampleCount,
+                minFilterSize = x.minFilterSize + y.minFilterSize
             };
             return addition;
         }
@@ -157,6 +167,7 @@ namespace LightUtilities
         public Color colorFilter = Color.white;
         public float intensity = 1;
         public float indirectIntensity = 1;
+        public float emissionRadius = 0;
         [Range(0, 180)]
         public float lightAngle = 45;
         public bool shadows = true;
@@ -184,6 +195,21 @@ namespace LightUtilities
         public float maxSmoothness = 1;
         public int shadowResolution = 128;
         public bool contactShadows = false;
+        //PCSS Shadows
+        [Range(0, 2)]
+        public float shadowSoftness = 0.5f;
+        [Range(1, 64)]
+        public int blockerSampleCount = 24;
+        [Range(1, 64)]
+        public int filterSampleCount = 16;
+        [Range(0.00001f, 0.001f)]
+        public float minFilterSize = 0.0002f;
+        //Volumetric
+        public bool useVolumetric = true;
+        [Range(0, 1)]
+        public float volumetricDimmer = 1;
+        [Range(0, 1)]
+        public float volumetricShadowDimmer = 1;
     }
 
     public static class LightingUtilities
@@ -218,11 +244,16 @@ namespace LightUtilities
             light.cullingMask = lightParameters.cullingMask;
 
             additionalLightData.intensity = lightParameters.intensity;
+            additionalLightData.shapeRadius = lightParameters.emissionRadius;
             additionalLightData.affectDiffuse = lightParameters.affectDiffuse;
             additionalLightData.affectSpecular = lightParameters.affectSpecular;
             additionalLightData.maxSmoothness = lightParameters.maxSmoothness;
             additionalLightData.fadeDistance = lightParameters.fadeDistance;
             additionalLightData.m_InnerSpotPercent = lightParameters.innerSpotPercent;
+            additionalLightData.shadowSoftness = lightParameters.shadowSoftness;
+            additionalLightData.blockerSampleCount = lightParameters.blockerSampleCount;
+            additionalLightData.filterSampleCount = lightParameters.filterSampleCount;
+            //TO DO ADD min filter size in 2019.1
 
             additionalShadowData.shadowFadeDistance = lightParameters.shadowMaxDistance;
             additionalShadowData.shadowResolution = lightParameters.shadowResolution;
@@ -240,6 +271,7 @@ namespace LightUtilities
 
             lerpLightParameters.intensity = Mathf.Lerp(from.intensity, to.intensity, weight);
             lerpLightParameters.indirectIntensity = Mathf.Lerp(from.indirectIntensity, to.indirectIntensity, weight);
+            lerpLightParameters.emissionRadius = Mathf.Lerp(from.emissionRadius, to.emissionRadius, weight);
             lerpLightParameters.range = Mathf.Lerp(from.range, to.range, weight);
             lerpLightParameters.lightAngle = Mathf.Lerp(from.lightAngle, to.lightAngle, weight);
             lerpLightParameters.type = from.type;
@@ -266,6 +298,15 @@ namespace LightUtilities
 
             lerpLightParameters.affectDiffuse = weight > 0.5f ? to.affectDiffuse : from.affectDiffuse;
             lerpLightParameters.affectSpecular = weight > 0.5f ? to.affectSpecular : from.affectSpecular;
+
+            lerpLightParameters.useVolumetric = weight > 0.5f ? to.useVolumetric : from.useVolumetric;
+            lerpLightParameters.volumetricDimmer = Mathf.Lerp(from.volumetricDimmer, to.volumetricDimmer, weight);
+            lerpLightParameters.volumetricShadowDimmer = Mathf.Lerp(from.volumetricShadowDimmer, to.volumetricShadowDimmer, weight);
+
+            lerpLightParameters.shadowSoftness = Mathf.Lerp(from.shadowSoftness, to.shadowSoftness, weight);
+            lerpLightParameters.blockerSampleCount = (int)Mathf.Lerp(from.blockerSampleCount, to.blockerSampleCount, weight);
+            lerpLightParameters.filterSampleCount = (int)Mathf.Lerp(from.filterSampleCount, to.filterSampleCount, weight);
+            lerpLightParameters.minFilterSize = Mathf.Lerp(from.minFilterSize, to.minFilterSize, weight);
 
             lerpLightParameters.cullingMask = weight > 0.5f ? to.cullingMask : from.cullingMask;
             lerpLightParameters.shadowQuality = weight > 0.5f ? to.shadowQuality : from.shadowQuality;
