@@ -51,10 +51,10 @@ namespace EditorLightUtilities
             LightUIUtilities.DrawSplitter();
             property.FindPropertyRelative("useVolumetric").boolValue = LightUIUtilities.DrawHeader("Volumetric", property.FindPropertyRelative("useVolumetric").boolValue);
             EditorGUI.indentLevel++;
-            //EditorGUI.BeginDisabledGroup(!property.FindPropertyRelative("useVolumetric").boolValue);
+            EditorGUI.BeginDisabledGroup(!property.FindPropertyRelative("useVolumetric").boolValue);
             EditorGUILayout.PropertyField(property.FindPropertyRelative("volumetricDimmer"));
             EditorGUILayout.PropertyField(property.FindPropertyRelative("volumetricShadowDimmer"));
-            //EditorGUI.EndDisabledGroup();
+            EditorGUI.EndDisabledGroup();
 
             // Draw label
             EditorGUILayout.Space();
@@ -63,7 +63,7 @@ namespace EditorLightUtilities
             property.FindPropertyRelative("shadows").boolValue = LightUIUtilities.DrawHeader("Shadows", property.FindPropertyRelative("shadows").boolValue);
             EditorGUI.indentLevel++;
 
-            //EditorGUI.BeginDisabledGroup(!property.FindPropertyRelative("shadows").boolValue);
+            EditorGUI.BeginDisabledGroup(!property.FindPropertyRelative("shadows").boolValue);
             EditorGUILayout.PropertyField(property.FindPropertyRelative("shadowResolution"));
             EditorGUILayout.PropertyField(property.FindPropertyRelative("ShadowNearClip"));
             EditorGUILayout.PropertyField(property.FindPropertyRelative("shadowStrength"), new GUIContent("Shadow Dimmer"));
@@ -74,7 +74,7 @@ namespace EditorLightUtilities
             EditorGUILayout.PropertyField(property.FindPropertyRelative("shadowSoftness"));
             EditorGUILayout.PropertyField(property.FindPropertyRelative("blockerSampleCount"));
             EditorGUILayout.PropertyField(property.FindPropertyRelative("filterSampleCount"));
-            //EditorGUILayout.PropertyField(property.FindPropertyRelative("minFilterSize"));
+            EditorGUILayout.PropertyField(property.FindPropertyRelative("minFilterSize"));
             EditorGUI.EndDisabledGroup();
 
 

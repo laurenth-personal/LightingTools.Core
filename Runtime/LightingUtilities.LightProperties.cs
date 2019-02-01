@@ -253,7 +253,7 @@ namespace LightUtilities
             additionalLightData.shadowSoftness = lightParameters.shadowSoftness;
             additionalLightData.blockerSampleCount = lightParameters.blockerSampleCount;
             additionalLightData.filterSampleCount = lightParameters.filterSampleCount;
-            //TO DO ADD min filter size in 2019.1
+            additionalLightData.minFilterSize = lightParameters.minFilterSize;
 
             additionalShadowData.shadowFadeDistance = lightParameters.shadowMaxDistance;
             additionalShadowData.shadowResolution = lightParameters.shadowResolution;
