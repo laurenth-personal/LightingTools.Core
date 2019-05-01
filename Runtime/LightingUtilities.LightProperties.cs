@@ -267,6 +267,10 @@ namespace LightUtilities
                     additionalLightData.lightTypeExtent = LightTypeExtent.Punctual;
                     additionalLightData.spotLightShape = SpotLightShape.Cone;
                     break;
+                case LightShape.Directional:
+                    light.type = LightType.Directional;
+                    additionalLightData.lightTypeExtent = LightTypeExtent.Punctual;
+                    break;
                 case LightShape.SpotBox:
                     light.type = LightType.Spot;
                     additionalLightData.lightTypeExtent = LightTypeExtent.Punctual;
