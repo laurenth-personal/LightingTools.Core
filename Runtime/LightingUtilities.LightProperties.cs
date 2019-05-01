@@ -29,10 +29,11 @@ namespace LightUtilities
         Spot = 1,
         Directional = 2,
         Rectangle = 3,
-        Sphere = 4,
+        //Sphere = 4,
         Line = 5,
-        Disc = 6,
-        Frustum = 7
+        //Disc = 6,
+        SpotPyramid = 7,
+        SpotBox = 8
     }
 
     [System.Serializable]
@@ -56,6 +57,12 @@ namespace LightUtilities
         public LightParameters(LightType specificType, LightmapPresetBakeType specificBakeMode)
         {
             type = specificType;
+            mode = specificBakeMode;
+        }
+
+        public LightParameters(LightShape specificShape, LightmapPresetBakeType specificBakeMode)
+        {
+            shape = specificShape;
             mode = specificBakeMode;
         }
 
@@ -84,10 +91,36 @@ namespace LightUtilities
             mode = specificBakeMode;
         }
 
+        public LightParameters(LightShape specificShape, LightmapPresetBakeType specificBakeMode, bool isNeutral)
+        {
+            if (isNeutral)
+            {
+                range = 0;
+                intensity = 0;
+                colorFilter = Color.black;
+                indirectIntensity = 0;
+                lightAngle = 0;
+                innerSpotPercent = 0;
+                cookieSize = 0;
+                ShadowNearClip = 0;
+                shadowStrength = 0;
+                viewBiasMin = 0;
+                viewBiasScale = 0;
+                normalBias = 0;
+                maxSmoothness = 0;
+                fadeDistance = 0;
+                shadowFadeDistance = 0;
+                shadowResolution = 0;
+            }
+            shape = specificShape;
+            mode = specificBakeMode;
+        }
+
         public static LightParameters DeepCopy(LightParameters c)
         {
             LightParameters temp = new LightParameters();
             temp.type = c.type;
+            temp.shape = c.shape;
             temp.mode = c.mode;
             temp.range = c.range;
             temp.intensity = c.intensity;
@@ -160,6 +193,7 @@ namespace LightUtilities
         }
 
         public LightType type = LightType.Point;
+        public LightShape shape = LightShape.Point;
         public LightmapPresetBakeType mode = LightmapPresetBakeType.Mixed;
         public float range = 8;
         public bool useColorTemperature;
@@ -221,7 +255,38 @@ namespace LightUtilities
             var additionalLightData = light.gameObject.GetComponent<HDAdditionalLightData>();
             var additionalShadowData = light.gameObject.GetComponent<AdditionalShadowData>();
 
-            light.type = lightParameters.type;
+            //HD
+            switch (lightParameters.shape)
+            {
+                case LightShape.Point:
+                    light.type = LightType.Point;
+                    additionalLightData.lightTypeExtent = LightTypeExtent.Punctual;
+                    break;
+                case LightShape.Spot:
+                    light.type = LightType.Spot;
+                    additionalLightData.lightTypeExtent = LightTypeExtent.Punctual;
+                    additionalLightData.spotLightShape = SpotLightShape.Cone;
+                    break;
+                case LightShape.SpotBox:
+                    light.type = LightType.Spot;
+                    additionalLightData.lightTypeExtent = LightTypeExtent.Punctual;
+                    additionalLightData.spotLightShape = SpotLightShape.Box;
+                    break;
+                case LightShape.SpotPyramid:
+                    light.type = LightType.Spot;
+                    additionalLightData.lightTypeExtent = LightTypeExtent.Punctual;
+                    additionalLightData.spotLightShape = SpotLightShape.Pyramid;
+                    break;
+                case LightShape.Rectangle:
+                    light.type = LightType.Point;
+                    additionalLightData.lightTypeExtent = LightTypeExtent.Rectangle;
+                    break;
+                case LightShape.Line:
+                    light.type = LightType.Point;
+                    additionalLightData.lightTypeExtent = LightTypeExtent.Tube;
+                    break;
+            }
+            
 
 #if UNITY_EDITOR
             switch (lightParameters.mode)
@@ -254,6 +319,9 @@ namespace LightUtilities
             additionalLightData.blockerSampleCount = lightParameters.blockerSampleCount;
             additionalLightData.filterSampleCount = lightParameters.filterSampleCount;
             additionalLightData.minFilterSize = lightParameters.minFilterSize;
+            additionalLightData.shapeWidth = Mathf.Max(lightParameters.width,0.01f);
+            additionalLightData.shapeHeight = Mathf.Max(lightParameters.length,0.01f);
+            additionalLightData.areaLightCookie = lightParameters.lightCookie;
 
             additionalShadowData.shadowFadeDistance = lightParameters.shadowMaxDistance;
             additionalShadowData.shadowResolution = lightParameters.shadowResolution;
@@ -274,7 +342,9 @@ namespace LightUtilities
             lerpLightParameters.emissionRadius = Mathf.Lerp(from.emissionRadius, to.emissionRadius, weight);
             lerpLightParameters.range = Mathf.Lerp(from.range, to.range, weight);
             lerpLightParameters.lightAngle = Mathf.Lerp(from.lightAngle, to.lightAngle, weight);
-            lerpLightParameters.type = from.type;
+            lerpLightParameters.width = Mathf.Lerp(from.width, to.width, weight);
+            lerpLightParameters.length = Mathf.Lerp(from.length, to.length, weight);
+            lerpLightParameters.cookieSize = Mathf.Lerp(from.cookieSize, to.cookieSize, weight);
             lerpLightParameters.colorFilter = Color.Lerp(from.colorFilter, to.colorFilter, weight);
             lerpLightParameters.maxSmoothness = Mathf.Lerp(from.maxSmoothness, to.maxSmoothness, weight);
             lerpLightParameters.innerSpotPercent = Mathf.Lerp(from.innerSpotPercent, to.innerSpotPercent, weight);
@@ -288,6 +358,7 @@ namespace LightUtilities
                 lerpLightParameters.shadows = true;
             }
 
+            lerpLightParameters.shape = weight > 0.5f ? to.shape : from.shape;
             lerpLightParameters.lightCookie = weight > 0.5f ? to.lightCookie : from.lightCookie;
             lerpLightParameters.shadowStrength = Mathf.Lerp(from.shadowStrength, to.shadowStrength, weight);
             lerpLightParameters.viewBiasMin = Mathf.Lerp(from.viewBiasMin, to.viewBiasMin, weight);

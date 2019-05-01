@@ -22,7 +22,7 @@ namespace EditorLightUtilities
 
 		    EditorGUILayout.PropertyField(property.FindPropertyRelative("intensity"));
             EditorGUILayout.PropertyField(property.FindPropertyRelative("colorFilter"));
-            EditorGUILayout.PropertyField(property.FindPropertyRelative("type"));
+            EditorGUILayout.PropertyField(property.FindPropertyRelative("shape"));
             EditorGUILayout.PropertyField(property.FindPropertyRelative("mode"), new GUIContent("Light mode"));
 		    EditorGUILayout.PropertyField(property.FindPropertyRelative("range"));
 		    EditorGUILayout.PropertyField(property.FindPropertyRelative("indirectIntensity"));
@@ -33,18 +33,7 @@ namespace EditorLightUtilities
 			    EditorGUILayout.PropertyField(property.FindPropertyRelative("cookieSize"));	
 		    }
 
-            // Draw label
-            EditorGUILayout.Space();
-            EditorGUI.indentLevel--;
-            LightUIUtilities.DrawSplitter();
-            LightUIUtilities.DrawHeader("Shape");
-            EditorGUI.indentLevel++;
-            if (property.FindPropertyRelative("type").enumValueIndex == 0) //if spotlight
-            {
-                EditorGUILayout.PropertyField(property.FindPropertyRelative("lightAngle"));
-                EditorGUILayout.PropertyField(property.FindPropertyRelative("innerSpotPercent"));
-                EditorGUILayout.PropertyField(property.FindPropertyRelative("maxSmoothness"));
-            }
+            DrawShapeSection(property);
 
             EditorGUILayout.Space();
             EditorGUI.indentLevel--;
@@ -88,6 +77,54 @@ namespace EditorLightUtilities
             EditorGUILayout.PropertyField(property.FindPropertyRelative("affectSpecular"));
             EditorGUILayout.PropertyField(property.FindPropertyRelative("cullingMask"));
             EditorGUI.EndProperty();
+        }
+
+        private void DrawShapeSection(SerializedProperty property)
+        {
+            // Draw label
+            EditorGUILayout.Space();
+            EditorGUI.indentLevel--;
+            LightUIUtilities.DrawSplitter();
+            LightUIUtilities.DrawHeader("Shape");
+            EditorGUI.indentLevel++;
+
+            switch(property.FindPropertyRelative("shape").enumValueIndex)
+            {
+                //PointLight
+                case 0:
+                    EditorGUILayout.PropertyField(property.FindPropertyRelative("maxSmoothness"));
+                    EditorGUILayout.PropertyField(property.FindPropertyRelative("emissionRadius"));
+                    break;
+                //Spotlight Cone
+                case 1:
+                    EditorGUILayout.PropertyField(property.FindPropertyRelative("lightAngle"));
+                    EditorGUILayout.PropertyField(property.FindPropertyRelative("innerSpotPercent"));
+                    EditorGUILayout.PropertyField(property.FindPropertyRelative("maxSmoothness"));
+                    EditorGUILayout.PropertyField(property.FindPropertyRelative("emissionRadius"));
+                    break;
+                //Directional
+                case 2:
+                    EditorGUILayout.PropertyField(property.FindPropertyRelative("maxSmoothness"));
+                    break;
+                //Rectangle
+                case 3:
+                    EditorGUILayout.PropertyField(property.FindPropertyRelative("width"));
+                    EditorGUILayout.PropertyField(property.FindPropertyRelative("length"));
+                    break;
+                //Tube
+                case 5:
+                    EditorGUILayout.PropertyField(property.FindPropertyRelative("length"));
+                    break;
+                //Spot Pyramid
+                case 7:
+                    EditorGUILayout.PropertyField(property.FindPropertyRelative("lightAngle"));
+                    break;
+                //Spot Box
+                case 8:
+                    EditorGUILayout.PropertyField(property.FindPropertyRelative("width"));
+                    EditorGUILayout.PropertyField(property.FindPropertyRelative("length"));
+                    break;
+            }
         }
     }
 }
