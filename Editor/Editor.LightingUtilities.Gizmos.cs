@@ -55,5 +55,12 @@ namespace EditorLightUtilities
             Gizmos.DrawLine(m_transform.position, m_transform.position + m_transform.TransformVector(m_transform.root.right * gizmoSize / m_transform.localScale.x));
             Gizmos.DrawLine(m_transform.position, m_transform.position + m_transform.TransformVector(m_transform.root.right * -gizmoSize / m_transform.localScale.x));
         }
+
+        public static void DrawRectangleGizmo(GameObject go, float width, float length)
+        {
+            Gizmos.matrix = go.transform.localToWorldMatrix;
+            Gizmos.DrawWireCube(Vector3.zero, new Vector3(width, length, 0));
+            Gizmos.matrix = Matrix4x4.zero;
+        }
     }
 }
