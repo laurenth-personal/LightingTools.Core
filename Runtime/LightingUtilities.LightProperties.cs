@@ -125,6 +125,8 @@ namespace LightUtilities
             temp.range = c.range;
             temp.intensity = c.intensity;
             temp.colorFilter = c.colorFilter;
+            temp.useColorTemperature = c.useColorTemperature;
+            temp.colorTemperature = c.colorTemperature;
             temp.indirectIntensity = c.indirectIntensity;
             temp.emissionRadius = c.emissionRadius;
             temp.lightAngle = c.lightAngle;
@@ -151,6 +153,9 @@ namespace LightUtilities
             temp.blockerSampleCount = c.blockerSampleCount;
             temp.filterSampleCount = c.filterSampleCount;
             temp.minFilterSize = c.minFilterSize;
+            temp.useVolumetric = c.useVolumetric;
+            temp.volumetricDimmer = c.volumetricDimmer;
+            temp.volumetricShadowDimmer = c.volumetricShadowDimmer;
             return temp;
         }
 
@@ -161,6 +166,7 @@ namespace LightUtilities
                 intensity = x.intensity + y.intensity,
                 range = x.range + y.range,
                 colorFilter = x.colorFilter + y.colorFilter,
+                useColorTemperature = x.useColorTemperature || y.useColorTemperature ? true : false,
                 colorTemperature = x.colorTemperature + y.colorTemperature,
                 indirectIntensity = x.indirectIntensity + y.indirectIntensity,
                 emissionRadius = x.emissionRadius + y.emissionRadius,
@@ -169,7 +175,6 @@ namespace LightUtilities
                 maxSmoothness = x.maxSmoothness + y.maxSmoothness,
                 shadowStrength = x.shadowStrength + y.shadowStrength,
                 shadowResolution = x.shadowResolution + y.shadowResolution,
-                useColorTemperature = x.useColorTemperature || y.useColorTemperature ? true : false,
                 shadows = x.shadows || y.shadows ? true : false,
                 affectDiffuse = x.affectDiffuse || y.affectDiffuse ? true : false,
                 affectSpecular = x.affectSpecular || y.affectSpecular ? true : false,
@@ -311,6 +316,7 @@ namespace LightUtilities
             light.spotAngle = lightParameters.lightAngle;
             light.cookie = lightParameters.lightCookie;
             light.cullingMask = lightParameters.cullingMask;
+            light.colorTemperature = lightParameters.colorTemperature;
 
             additionalLightData.intensity = lightParameters.intensity;
             additionalLightData.shapeRadius = lightParameters.emissionRadius;
@@ -326,6 +332,8 @@ namespace LightUtilities
             additionalLightData.shapeWidth = Mathf.Max(lightParameters.width,0.01f);
             additionalLightData.shapeHeight = Mathf.Max(lightParameters.length,0.01f);
             additionalLightData.areaLightCookie = lightParameters.lightCookie;
+            additionalLightData.shadowNearPlane = lightParameters.ShadowNearClip;
+            additionalLightData.volumetricDimmer = lightParameters.volumetricDimmer;
 
             additionalShadowData.shadowFadeDistance = lightParameters.shadowMaxDistance;
             additionalShadowData.shadowResolution = lightParameters.shadowResolution;
@@ -335,6 +343,7 @@ namespace LightUtilities
             additionalShadowData.normalBiasMin = lightParameters.normalBias;
             additionalShadowData.normalBiasMax = lightParameters.normalBias;
             additionalShadowData.shadowDimmer = lightParameters.shadowStrength;
+            additionalShadowData.volumetricShadowDimmer = lightParameters.volumetricShadowDimmer;
         }
 
         public static LightParameters LerpLightParameters(LightParameters from, LightParameters to, float weight)
@@ -350,6 +359,7 @@ namespace LightUtilities
             lerpLightParameters.length = Mathf.Lerp(from.length, to.length, weight);
             lerpLightParameters.cookieSize = Mathf.Lerp(from.cookieSize, to.cookieSize, weight);
             lerpLightParameters.colorFilter = Color.Lerp(from.colorFilter, to.colorFilter, weight);
+            lerpLightParameters.colorTemperature = Mathf.Lerp(from.colorTemperature, to.colorTemperature, weight);
             lerpLightParameters.maxSmoothness = Mathf.Lerp(from.maxSmoothness, to.maxSmoothness, weight);
             lerpLightParameters.innerSpotPercent = Mathf.Lerp(from.innerSpotPercent, to.innerSpotPercent, weight);
 
@@ -361,7 +371,7 @@ namespace LightUtilities
             {
                 lerpLightParameters.shadows = true;
             }
-
+            lerpLightParameters.useColorTemperature = weight > 0.5f ? to.useColorTemperature : from.useColorTemperature;
             lerpLightParameters.shape = weight > 0.5f ? to.shape : from.shape;
             lerpLightParameters.lightCookie = weight > 0.5f ? to.lightCookie : from.lightCookie;
             lerpLightParameters.shadowStrength = Mathf.Lerp(from.shadowStrength, to.shadowStrength, weight);
