@@ -32,6 +32,7 @@ namespace EditorLightUtilities
 		    {
 			    EditorGUILayout.PropertyField(property.FindPropertyRelative("cookieSize"));	
 		    }
+            EditorGUILayout.PropertyField(property.FindPropertyRelative("lightLayers"));
 
             DrawShapeSection(property);
 
@@ -65,7 +66,7 @@ namespace EditorLightUtilities
             EditorGUILayout.PropertyField(property.FindPropertyRelative("filterSampleCount"));
             EditorGUILayout.PropertyField(property.FindPropertyRelative("minFilterSize"));
             EditorGUI.EndDisabledGroup();
-
+            EditorGUILayout.PropertyField(property.FindPropertyRelative("contactShadows"));
 
             // Draw label
             EditorGUILayout.Space();
