@@ -29,9 +29,9 @@ namespace LightUtilities
         Spot = 1,
         Directional = 2,
         Rectangle = 3,
-        //Sphere = 4,
+        Sphere = 4,
         Line = 5,
-        //Disc = 6,
+        Disc = 6,
         SpotPyramid = 7,
         SpotBox = 8
     }
@@ -153,6 +153,8 @@ namespace LightUtilities
             temp.blockerSampleCount = c.blockerSampleCount;
             temp.filterSampleCount = c.filterSampleCount;
             temp.minFilterSize = c.minFilterSize;
+            temp.lightLayers = c.lightLayers;
+            temp.contactShadows = c.contactShadows;
             temp.useVolumetric = c.useVolumetric;
             temp.volumetricDimmer = c.volumetricDimmer;
             temp.volumetricShadowDimmer = c.volumetricShadowDimmer;
@@ -230,6 +232,7 @@ namespace LightUtilities
         public float shadowStrength = 1;
         public float shadowMaxDistance = 150;
         public LayerMask cullingMask = -1;
+        public LightLayerEnum lightLayers = LightLayerEnum.LightLayerDefault;
         [Range(0, 1)]
         public float maxSmoothness = 1;
         public int shadowResolution = 128;
@@ -316,6 +319,7 @@ namespace LightUtilities
             light.spotAngle = lightParameters.lightAngle;
             light.cookie = lightParameters.lightCookie;
             light.cullingMask = lightParameters.cullingMask;
+            light.renderingLayerMask = (int)lightParameters.lightLayers;
             light.colorTemperature = lightParameters.colorTemperature;
 
             additionalLightData.intensity = lightParameters.intensity;
@@ -332,6 +336,7 @@ namespace LightUtilities
             additionalLightData.shapeWidth = Mathf.Max(lightParameters.width,0.01f);
             additionalLightData.shapeHeight = Mathf.Max(lightParameters.length,0.01f);
             additionalLightData.areaLightCookie = lightParameters.lightCookie;
+            additionalLightData.lightLayers = lightParameters.lightLayers;
             additionalLightData.shadowNearPlane = lightParameters.ShadowNearClip;
             additionalLightData.volumetricDimmer = lightParameters.volumetricDimmer;
 
@@ -343,6 +348,7 @@ namespace LightUtilities
             additionalShadowData.normalBiasMin = lightParameters.normalBias;
             additionalShadowData.normalBiasMax = lightParameters.normalBias;
             additionalShadowData.shadowDimmer = lightParameters.shadowStrength;
+            additionalShadowData.contactShadows = lightParameters.contactShadows;
             additionalShadowData.volumetricShadowDimmer = lightParameters.volumetricShadowDimmer;
         }
 
@@ -371,6 +377,8 @@ namespace LightUtilities
             {
                 lerpLightParameters.shadows = true;
             }
+
+            lerpLightParameters.lightLayers = weight > 0.5f ? to.lightLayers : from.lightLayers;
             lerpLightParameters.useColorTemperature = weight > 0.5f ? to.useColorTemperature : from.useColorTemperature;
             lerpLightParameters.shape = weight > 0.5f ? to.shape : from.shape;
             lerpLightParameters.lightCookie = weight > 0.5f ? to.lightCookie : from.lightCookie;
@@ -392,6 +400,7 @@ namespace LightUtilities
             lerpLightParameters.blockerSampleCount = (int)Mathf.Lerp(from.blockerSampleCount, to.blockerSampleCount, weight);
             lerpLightParameters.filterSampleCount = (int)Mathf.Lerp(from.filterSampleCount, to.filterSampleCount, weight);
             lerpLightParameters.minFilterSize = Mathf.Lerp(from.minFilterSize, to.minFilterSize, weight);
+            lerpLightParameters.contactShadows = weight > 0.5f ? to.contactShadows : from.contactShadows;
 
             lerpLightParameters.cullingMask = weight > 0.5f ? to.cullingMask : from.cullingMask;
             lerpLightParameters.shadowQuality = weight > 0.5f ? to.shadowQuality : from.shadowQuality;

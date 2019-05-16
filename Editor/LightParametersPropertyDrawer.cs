@@ -2,6 +2,7 @@ using LightUtilities;
 using UnityEditor;
 using UnityEngine;
 
+
 namespace EditorLightUtilities
 {
     [CustomPropertyDrawer (typeof (LightParameters))]
@@ -32,6 +33,8 @@ namespace EditorLightUtilities
 		    {
 			    EditorGUILayout.PropertyField(property.FindPropertyRelative("cookieSize"));	
 		    }
+            LightUIUtilities.LightLayerMaskDrawer(new GUIContent("Light Layers"), property.FindPropertyRelative("lightLayers"));
+            //EditorGUILayout.PropertyField(property.FindPropertyRelative("lightLayers"));
 
             DrawShapeSection(property);
 
@@ -65,7 +68,7 @@ namespace EditorLightUtilities
             EditorGUILayout.PropertyField(property.FindPropertyRelative("filterSampleCount"));
             EditorGUILayout.PropertyField(property.FindPropertyRelative("minFilterSize"));
             EditorGUI.EndDisabledGroup();
-
+            EditorGUILayout.PropertyField(property.FindPropertyRelative("contactShadows"));
 
             // Draw label
             EditorGUILayout.Space();

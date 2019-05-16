@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.Experimental.Rendering.HDPipeline;
 
 namespace EditorLightUtilities
 {
@@ -121,6 +122,34 @@ namespace EditorLightUtilities
                 e.Use();
             }
             return state;
+        }
+
+        public static void LightLayerMaskDrawer(GUIContent label, SerializedProperty property)
+        {
+            var renderingLayerMask = property.intValue;
+            int lightLayer;
+            if (property.hasMultipleDifferentValues)
+            {
+                EditorGUI.showMixedValue = true;
+                lightLayer = 0;
+            }
+            else
+                lightLayer = (byte)renderingLayerMask;
+            EditorGUI.BeginChangeCheck();
+            lightLayer = System.Convert.ToInt32(EditorGUILayout.EnumFlagsField(label, (LightLayerEnum)lightLayer));
+            if (EditorGUI.EndChangeCheck())
+            {
+                lightLayer = LightLayerToRenderingLayerMask(lightLayer, renderingLayerMask);
+                property.intValue = lightLayer;
+            }
+            EditorGUI.showMixedValue = false;
+        }
+
+        internal static int LightLayerToRenderingLayerMask(int lightLayer, int renderingLayerMask)
+        {
+            var renderingLayerMask_u32 = (uint)renderingLayerMask;
+            var lightLayer_u8 = (byte)lightLayer;
+            return (int)((renderingLayerMask_u32 & 0xFFFFFF00) | lightLayer_u8);
         }
     }
 }
