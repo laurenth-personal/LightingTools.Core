@@ -34,7 +34,6 @@ namespace EditorLightUtilities
 			    EditorGUILayout.PropertyField(property.FindPropertyRelative("cookieSize"));	
 		    }
             LightUIUtilities.LightLayerMaskDrawer(new GUIContent("Light Layers"), property.FindPropertyRelative("lightLayers"));
-            //EditorGUILayout.PropertyField(property.FindPropertyRelative("lightLayers"));
 
             DrawShapeSection(property);
 
