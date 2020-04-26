@@ -1,6 +1,6 @@
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
-using UnityEngine.Experimental.Rendering.HDPipeline;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.HighDefinition;
 
 namespace LightUtilities
 {
@@ -86,6 +86,8 @@ namespace LightUtilities
                 fadeDistance = 0;
                 shadowFadeDistance = 0;
                 shadowResolution = 0;
+                shadowTint = Color.white;
+                penumbraTint = Color.white;
             }
             type = specificType;
             mode = specificBakeMode;
@@ -111,6 +113,8 @@ namespace LightUtilities
                 fadeDistance = 0;
                 shadowFadeDistance = 0;
                 shadowResolution = 0;
+                shadowTint = Color.white;
+                penumbraTint = Color.white;
             }
             shape = specificShape;
             mode = specificBakeMode;
@@ -158,6 +162,8 @@ namespace LightUtilities
             temp.useVolumetric = c.useVolumetric;
             temp.volumetricDimmer = c.volumetricDimmer;
             temp.volumetricShadowDimmer = c.volumetricShadowDimmer;
+            temp.shadowTint = c.shadowTint;
+            temp.penumbraTint = c.penumbraTint;
             return temp;
         }
 
@@ -194,7 +200,9 @@ namespace LightUtilities
                 shadowSoftness = x.shadowSoftness + y.shadowSoftness,
                 blockerSampleCount = x.blockerSampleCount + y.blockerSampleCount,
                 filterSampleCount = x.filterSampleCount + y.filterSampleCount,
-                minFilterSize = x.minFilterSize + y.minFilterSize
+                minFilterSize = x.minFilterSize + y.minFilterSize,
+                shadowTint = x.shadowTint + y.shadowTint,
+                penumbraTint = x.penumbraTint + y.penumbraTint
             };
             return addition;
         }
@@ -218,6 +226,8 @@ namespace LightUtilities
         public float viewBiasMin = 0.2f;
         public float viewBiasScale = 1.0f;
         public float normalBias = 0.2f;
+        public Color shadowTint = Color.white;
+        public Color penumbraTint = Color.white;
         public Texture lightCookie;
         public float cookieSize = 5;
         [Range(0f, 100f)]
@@ -261,41 +271,43 @@ namespace LightUtilities
         {
             //HD
             var additionalLightData = light.gameObject.GetComponent<HDAdditionalLightData>();
-            var additionalShadowData = light.gameObject.GetComponent<AdditionalShadowData>();
+            //var additionalShadowData = light.gameObject.GetComponent<AdditionalShadowData>();
 
             //HD
             switch (lightParameters.shape)
             {
                 case LightShape.Point:
                     light.type = LightType.Point;
-                    additionalLightData.lightTypeExtent = LightTypeExtent.Punctual;
+                    additionalLightData.type = HDLightType.Point;
                     break;
                 case LightShape.Spot:
                     light.type = LightType.Spot;
-                    additionalLightData.lightTypeExtent = LightTypeExtent.Punctual;
+                    additionalLightData.type = HDLightType.Spot;
                     additionalLightData.spotLightShape = SpotLightShape.Cone;
                     break;
                 case LightShape.Directional:
                     light.type = LightType.Directional;
-                    additionalLightData.lightTypeExtent = LightTypeExtent.Punctual;
+                    additionalLightData.type = HDLightType.Directional;
                     break;
                 case LightShape.SpotBox:
                     light.type = LightType.Spot;
-                    additionalLightData.lightTypeExtent = LightTypeExtent.Punctual;
+                    additionalLightData.type = HDLightType.Spot;
                     additionalLightData.spotLightShape = SpotLightShape.Box;
                     break;
                 case LightShape.SpotPyramid:
                     light.type = LightType.Spot;
-                    additionalLightData.lightTypeExtent = LightTypeExtent.Punctual;
+                    additionalLightData.type = HDLightType.Spot;
                     additionalLightData.spotLightShape = SpotLightShape.Pyramid;
                     break;
                 case LightShape.Rectangle:
                     light.type = LightType.Point;
-                    additionalLightData.lightTypeExtent = LightTypeExtent.Rectangle;
+                    additionalLightData.type = HDLightType.Area;
+                    additionalLightData.areaLightShape = AreaLightShape.Rectangle;
                     break;
                 case LightShape.Line:
                     light.type = LightType.Point;
-                    additionalLightData.lightTypeExtent = LightTypeExtent.Tube;
+                    additionalLightData.type = HDLightType.Area;
+                    additionalLightData.areaLightShape = AreaLightShape.Tube;
                     break;
             }
             
@@ -328,28 +340,31 @@ namespace LightUtilities
             additionalLightData.affectSpecular = lightParameters.affectSpecular;
             additionalLightData.maxSmoothness = lightParameters.maxSmoothness;
             additionalLightData.fadeDistance = lightParameters.fadeDistance;
-            additionalLightData.m_InnerSpotPercent = lightParameters.innerSpotPercent;
-            additionalLightData.shadowSoftness = lightParameters.shadowSoftness;
+            additionalLightData.innerSpotPercent = lightParameters.innerSpotPercent;
+            //additionalLightData.shadowSoftness = lightParameters.shadowSoftness;
             additionalLightData.blockerSampleCount = lightParameters.blockerSampleCount;
             additionalLightData.filterSampleCount = lightParameters.filterSampleCount;
             additionalLightData.minFilterSize = lightParameters.minFilterSize;
             additionalLightData.shapeWidth = Mathf.Max(lightParameters.width,0.01f);
             additionalLightData.shapeHeight = Mathf.Max(lightParameters.length,0.01f);
             additionalLightData.areaLightCookie = lightParameters.lightCookie;
-            additionalLightData.lightLayers = lightParameters.lightLayers;
+            additionalLightData.lightlayersMask = lightParameters.lightLayers;
             additionalLightData.shadowNearPlane = lightParameters.ShadowNearClip;
             additionalLightData.volumetricDimmer = lightParameters.volumetricDimmer;
 
-            additionalShadowData.shadowFadeDistance = lightParameters.shadowMaxDistance;
-            additionalShadowData.shadowResolution = lightParameters.shadowResolution;
-            additionalShadowData.shadowDimmer = lightParameters.shadowStrength;
-            additionalShadowData.viewBiasMin = lightParameters.viewBiasMin;
-            additionalShadowData.viewBiasScale = lightParameters.viewBiasScale;
-            additionalShadowData.normalBiasMin = lightParameters.normalBias;
-            additionalShadowData.normalBiasMax = lightParameters.normalBias;
-            additionalShadowData.shadowDimmer = lightParameters.shadowStrength;
-            additionalShadowData.contactShadows = lightParameters.contactShadows;
-            additionalShadowData.volumetricShadowDimmer = lightParameters.volumetricShadowDimmer;
+            additionalLightData.shadowFadeDistance = lightParameters.shadowMaxDistance;
+            //additionalLightData.shadowResolution = lightParameters.shadowResolution;
+            additionalLightData.shadowDimmer = lightParameters.shadowStrength;
+            //additionalLightData.viewBiasMin = lightParameters.viewBiasMin;
+            //additionalLightData.viewBiasScale = lightParameters.viewBiasScale;
+            additionalLightData.normalBias = lightParameters.normalBias;
+            additionalLightData.shadowDimmer = lightParameters.shadowStrength;
+            //additionalLightData.useContactShadow = lightParameters.contactShadows;
+            additionalLightData.volumetricShadowDimmer = lightParameters.volumetricShadowDimmer;
+            additionalLightData.shadowTint = lightParameters.shadowTint;
+            
+            //TODO : fix penumbra mode
+            //additionalLightData.penumbraTint = lightParameters.penumbraTint;
         }
 
         public static LightParameters LerpLightParameters(LightParameters from, LightParameters to, float weight)
@@ -404,6 +419,13 @@ namespace LightUtilities
 
             lerpLightParameters.cullingMask = weight > 0.5f ? to.cullingMask : from.cullingMask;
             lerpLightParameters.shadowQuality = weight > 0.5f ? to.shadowQuality : from.shadowQuality;
+
+            lerpLightParameters.shadowTint.r = Mathf.Lerp(from.shadowTint.r, to.shadowTint.r, weight);
+            lerpLightParameters.shadowTint.g = Mathf.Lerp(from.shadowTint.g, to.shadowTint.g, weight);
+            lerpLightParameters.shadowTint.b = Mathf.Lerp(from.shadowTint.b, to.shadowTint.b, weight);
+            lerpLightParameters.penumbraTint.r = Mathf.Lerp(from.penumbraTint.r, to.penumbraTint.r, weight);
+            lerpLightParameters.penumbraTint.g = Mathf.Lerp(from.penumbraTint.g, to.penumbraTint.g, weight);
+            lerpLightParameters.penumbraTint.b = Mathf.Lerp(from.penumbraTint.b, to.penumbraTint.b, weight);
 
             return lerpLightParameters;
         }

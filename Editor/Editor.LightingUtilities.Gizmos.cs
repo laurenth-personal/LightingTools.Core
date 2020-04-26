@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEditor;
-using UnityEngine.Experimental.Rendering.HDPipeline;
+using UnityEngine.Rendering.HighDefinition;
 
 namespace EditorLightUtilities
 {
@@ -25,7 +25,7 @@ namespace EditorLightUtilities
 
             var additionalLight = spotlight.GetComponent<HDAdditionalLightData>();
             if(additionalLight)
-                DrawCone(additionalLight.m_InnerSpotPercent* 0.01f * spotlight.spotAngle, spotlight.range, spotlight.transform);
+                DrawCone(additionalLight.innerSpotPercent* 0.01f * spotlight.spotAngle, spotlight.range, spotlight.transform);
         }
 
         public static void DrawCone(float angle, float range, Transform transform)

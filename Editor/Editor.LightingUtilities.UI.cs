@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEditor;
-using UnityEngine.Experimental.Rendering.HDPipeline;
+using UnityEngine.Rendering.HighDefinition;
 
 namespace EditorLightUtilities
 {
