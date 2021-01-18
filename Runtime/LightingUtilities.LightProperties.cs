@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.Rendering;
+#if HDRP
 using UnityEngine.Rendering.HighDefinition;
+#endif
 
 namespace LightUtilities
 {
@@ -157,6 +159,7 @@ namespace LightUtilities
             temp.blockerSampleCount = c.blockerSampleCount;
             temp.filterSampleCount = c.filterSampleCount;
             temp.minFilterSize = c.minFilterSize;
+#if HDRP
             temp.lightLayers = c.lightLayers;
             temp.contactShadows = c.contactShadows;
             temp.useVolumetric = c.useVolumetric;
@@ -164,6 +167,7 @@ namespace LightUtilities
             temp.volumetricShadowDimmer = c.volumetricShadowDimmer;
             temp.shadowTint = c.shadowTint;
             temp.penumbraTint = c.penumbraTint;
+#endif
             return temp;
         }
 
@@ -242,7 +246,9 @@ namespace LightUtilities
         public float shadowStrength = 1;
         public float shadowMaxDistance = 150;
         public LayerMask cullingMask = -1;
+#if HDRP
         public LightLayerEnum lightLayers = LightLayerEnum.LightLayerDefault;
+#endif
         [Range(0, 1)]
         public float maxSmoothness = 1;
         public int shadowResolution = 128;
@@ -269,45 +275,59 @@ namespace LightUtilities
 
         public static void ApplyLightParameters(Light light, LightParameters lightParameters)
         {
-            //HD
+#if HDRP
             var additionalLightData = light.gameObject.GetComponent<HDAdditionalLightData>();
-            //var additionalShadowData = light.gameObject.GetComponent<AdditionalShadowData>();
+#endif
 
             //HD
             switch (lightParameters.shape)
             {
                 case LightShape.Point:
                     light.type = LightType.Point;
+#if HDRP
                     additionalLightData.type = HDLightType.Point;
+#endif
                     break;
                 case LightShape.Spot:
                     light.type = LightType.Spot;
+#if HDRP
                     additionalLightData.type = HDLightType.Spot;
                     additionalLightData.spotLightShape = SpotLightShape.Cone;
+#endif
                     break;
                 case LightShape.Directional:
                     light.type = LightType.Directional;
+#if HDRP
                     additionalLightData.type = HDLightType.Directional;
+#endif
                     break;
                 case LightShape.SpotBox:
                     light.type = LightType.Spot;
+#if HDRP
                     additionalLightData.type = HDLightType.Spot;
                     additionalLightData.spotLightShape = SpotLightShape.Box;
+#endif
                     break;
                 case LightShape.SpotPyramid:
                     light.type = LightType.Spot;
+#if HDRP
                     additionalLightData.type = HDLightType.Spot;
                     additionalLightData.spotLightShape = SpotLightShape.Pyramid;
+#endif
                     break;
                 case LightShape.Rectangle:
                     light.type = LightType.Point;
+#if HDRP
                     additionalLightData.type = HDLightType.Area;
                     additionalLightData.areaLightShape = AreaLightShape.Rectangle;
+#endif
                     break;
                 case LightShape.Line:
                     light.type = LightType.Point;
+#if HDRP
                     additionalLightData.type = HDLightType.Area;
                     additionalLightData.areaLightShape = AreaLightShape.Tube;
+#endif
                     break;
             }
             
@@ -331,9 +351,12 @@ namespace LightUtilities
             light.spotAngle = lightParameters.lightAngle;
             light.cookie = lightParameters.lightCookie;
             light.cullingMask = lightParameters.cullingMask;
+#if HDRP
             light.renderingLayerMask = (int)lightParameters.lightLayers;
+#endif
             light.colorTemperature = lightParameters.colorTemperature;
 
+#if HDRP
             additionalLightData.intensity = lightParameters.intensity;
             additionalLightData.shapeRadius = lightParameters.emissionRadius;
             additionalLightData.affectDiffuse = lightParameters.affectDiffuse;
@@ -365,6 +388,7 @@ namespace LightUtilities
             
             //TODO : fix penumbra mode
             //additionalLightData.penumbraTint = lightParameters.penumbraTint;
+#endif
         }
 
         public static LightParameters LerpLightParameters(LightParameters from, LightParameters to, float weight)
@@ -392,8 +416,9 @@ namespace LightUtilities
             {
                 lerpLightParameters.shadows = true;
             }
-
+#if HDRP
             lerpLightParameters.lightLayers = weight > 0.5f ? to.lightLayers : from.lightLayers;
+#endif
             lerpLightParameters.useColorTemperature = weight > 0.5f ? to.useColorTemperature : from.useColorTemperature;
             lerpLightParameters.shape = weight > 0.5f ? to.shape : from.shape;
             lerpLightParameters.lightCookie = weight > 0.5f ? to.lightCookie : from.lightCookie;

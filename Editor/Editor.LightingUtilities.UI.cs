@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEditor;
+#if HDRP
 using UnityEngine.Rendering.HighDefinition;
+#endif
 
 namespace EditorLightUtilities
 {
@@ -136,12 +138,14 @@ namespace EditorLightUtilities
             else
                 lightLayer = (byte)renderingLayerMask;
             EditorGUI.BeginChangeCheck();
+#if HDRP
             lightLayer = System.Convert.ToInt32(EditorGUILayout.EnumFlagsField(label, (LightLayerEnum)lightLayer));
             if (EditorGUI.EndChangeCheck())
             {
                 lightLayer = LightLayerToRenderingLayerMask(lightLayer, renderingLayerMask);
                 property.intValue = lightLayer;
             }
+#endif
             EditorGUI.showMixedValue = false;
         }
 

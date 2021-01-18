@@ -4,7 +4,6 @@
         "LightingTools.Core",
         "Unity.RenderPipelines.HighDefinition.Runtime"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
@@ -13,5 +12,13 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": []
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.render-pipelines.high-definition",
+            "expression": "4.2.0",
+            "define": "HDRP"
+        }
+    ],
+    "noEngineReferences": false
 }

@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEditor;
+#if HDRP
 using UnityEngine.Rendering.HighDefinition;
+#endif
 
 namespace EditorLightUtilities
 {
@@ -23,9 +25,11 @@ namespace EditorLightUtilities
 
             DrawCone(spotlight.spotAngle, spotlight.range, spotlight.transform);
 
+#if HDRP
             var additionalLight = spotlight.GetComponent<HDAdditionalLightData>();
             if(additionalLight)
                 DrawCone(additionalLight.innerSpotPercent* 0.01f * spotlight.spotAngle, spotlight.range, spotlight.transform);
+#endif
         }
 
         public static void DrawCone(float angle, float range, Transform transform)
