@@ -3,6 +3,6 @@
   "displayName": "Lighting Tools Core",
   "version": "2018.3.0",
   "unity": "2018.3",
-  "description": "Lighting tools test.",
+  "description": "Core Library for lighting tools :\n- cinelights\n- sunlight",
   "type": "library"
 }
