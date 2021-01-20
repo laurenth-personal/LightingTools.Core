@@ -1,8 +1,8 @@
 {
-    "name": "li.lightingtools.core",
-    "displayName": "Lighting Tools Core",
-    "version": "0.0.1",
-    "unity": "2018.3",
-    "description": "Lighting tools test.",
-    "dependencies": { "com.unity.render-pipelines.high-definition": "4.2.0-preview" }
+  "name": "com.laurenth.lightingtools-core",
+  "displayName": "Lighting Tools Core",
+  "version": "2018.3.0",
+  "unity": "2018.3",
+  "description": "Lighting tools test.",
+  "type": "library"
 }
