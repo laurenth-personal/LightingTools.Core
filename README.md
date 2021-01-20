@@ -1,2 +1,5 @@
 # LightingTools.Core
-Lighting Tools Core
+
+Core Library for lighting tools :
+- cinelights
+- sunlight
