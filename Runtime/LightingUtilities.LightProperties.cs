@@ -88,7 +88,7 @@ namespace LightUtilities
                 fadeDistance = 0;
                 shadowFadeDistance = 0;
                 shadowResolution = 0;
-                shadowTint = Color.white;
+                shadowTint = Color.black;
                 penumbraTint = Color.white;
             }
             type = specificType;
@@ -115,7 +115,7 @@ namespace LightUtilities
                 fadeDistance = 0;
                 shadowFadeDistance = 0;
                 shadowResolution = 0;
-                shadowTint = Color.white;
+                shadowTint = Color.black;
                 penumbraTint = Color.white;
             }
             shape = specificShape;
@@ -230,7 +230,7 @@ namespace LightUtilities
         public float viewBiasMin = 0.2f;
         public float viewBiasScale = 1.0f;
         public float normalBias = 0.2f;
-        public Color shadowTint = Color.white;
+        public Color shadowTint = Color.black;
         public Color penumbraTint = Color.white;
         public Texture lightCookie;
         public float cookieSize = 5;
