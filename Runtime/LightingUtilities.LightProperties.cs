@@ -247,7 +247,7 @@ namespace LightUtilities
         public float shadowMaxDistance = 150;
         public LayerMask cullingMask = -1;
 #if HDRP
-        public LightLayerEnum lightLayers = LightLayerEnum.LightLayerDefault;
+        public UnityEngine.Rendering.HighDefinition.RenderingLayerMask lightLayers = UnityEngine.Rendering.HighDefinition.RenderingLayerMask.Default;
 #endif
         [Range(0, 1)]
         public float maxSmoothness = 1;
@@ -284,50 +284,31 @@ namespace LightUtilities
             {
                 case LightShape.Point:
                     light.type = LightType.Point;
-#if HDRP
-                    additionalLightData.type = HDLightType.Point;
-#endif
+
                     break;
                 case LightShape.Spot:
                     light.type = LightType.Spot;
-#if HDRP
-                    additionalLightData.type = HDLightType.Spot;
-                    additionalLightData.spotLightShape = SpotLightShape.Cone;
-#endif
+
                     break;
                 case LightShape.Directional:
                     light.type = LightType.Directional;
-#if HDRP
-                    additionalLightData.type = HDLightType.Directional;
-#endif
+
                     break;
                 case LightShape.SpotBox:
-                    light.type = LightType.Spot;
-#if HDRP
-                    additionalLightData.type = HDLightType.Spot;
-                    additionalLightData.spotLightShape = SpotLightShape.Box;
-#endif
+                    light.type = LightType.Box;
+
                     break;
                 case LightShape.SpotPyramid:
-                    light.type = LightType.Spot;
-#if HDRP
-                    additionalLightData.type = HDLightType.Spot;
-                    additionalLightData.spotLightShape = SpotLightShape.Pyramid;
-#endif
+                    light.type = LightType.Pyramid;
+
                     break;
                 case LightShape.Rectangle:
-                    light.type = LightType.Point;
-#if HDRP
-                    additionalLightData.type = HDLightType.Area;
-                    additionalLightData.areaLightShape = AreaLightShape.Rectangle;
-#endif
+                    light.type = LightType.Rectangle;
+
                     break;
                 case LightShape.Line:
-                    light.type = LightType.Point;
-#if HDRP
-                    additionalLightData.type = HDLightType.Area;
-                    additionalLightData.areaLightShape = AreaLightShape.Tube;
-#endif
+                    light.type = LightType.Tube;
+    
                     break;
             }
             

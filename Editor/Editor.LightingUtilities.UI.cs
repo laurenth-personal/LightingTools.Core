@@ -139,7 +139,7 @@ namespace EditorLightUtilities
                 lightLayer = (byte)renderingLayerMask;
             EditorGUI.BeginChangeCheck();
 #if HDRP
-            lightLayer = System.Convert.ToInt32(EditorGUILayout.EnumFlagsField(label, (LightLayerEnum)lightLayer));
+            lightLayer = System.Convert.ToInt32(EditorGUILayout.EnumFlagsField(label, (UnityEngine.Rendering.HighDefinition.RenderingLayerMask)lightLayer));
             if (EditorGUI.EndChangeCheck())
             {
                 lightLayer = LightLayerToRenderingLayerMask(lightLayer, renderingLayerMask);
