@@ -71,26 +71,7 @@ namespace LightUtilities
         public LightParameters(LightType specificType, LightmapPresetBakeType specificBakeMode, bool isNeutral)
         {
             if (isNeutral)
-            {
-                range = 0;
-                intensity = 0;
-                colorFilter = Color.black;
-                indirectIntensity = 0;
-                lightAngle = 0;
-                innerSpotPercent = 0;
-                cookieSize = 0;
-                ShadowNearClip = 0;
-                shadowStrength = 0;
-                viewBiasMin = 0;
-                viewBiasScale = 0;
-                normalBias = 0;
-                maxSmoothness = 0;
-                fadeDistance = 0;
-                shadowFadeDistance = 0;
-                shadowResolution = 0;
-                shadowTint = Color.black;
-                penumbraTint = Color.white;
-            }
+                ResetToNeutral();
             type = specificType;
             mode = specificBakeMode;
         }
@@ -98,28 +79,34 @@ namespace LightUtilities
         public LightParameters(LightShape specificShape, LightmapPresetBakeType specificBakeMode, bool isNeutral)
         {
             if (isNeutral)
-            {
-                range = 0;
-                intensity = 0;
-                colorFilter = Color.black;
-                indirectIntensity = 0;
-                lightAngle = 0;
-                innerSpotPercent = 0;
-                cookieSize = 0;
-                ShadowNearClip = 0;
-                shadowStrength = 0;
-                viewBiasMin = 0;
-                viewBiasScale = 0;
-                normalBias = 0;
-                maxSmoothness = 0;
-                fadeDistance = 0;
-                shadowFadeDistance = 0;
-                shadowResolution = 0;
-                shadowTint = Color.black;
-                penumbraTint = Color.white;
-            }
+                ResetToNeutral();
             shape = specificShape;
             mode = specificBakeMode;
+        }
+
+        /// <summary>
+        /// Reset all parameters to neutral (zero/black) values for initialization.
+        /// </summary>
+        private void ResetToNeutral()
+        {
+            range = 0;
+            intensity = 0;
+            colorFilter = Color.black;
+            indirectIntensity = 0;
+            lightAngle = 0;
+            innerSpotPercent = 0;
+            cookieSize = 0;
+            ShadowNearClip = 0;
+            shadowStrength = 0;
+            viewBiasMin = 0;
+            viewBiasScale = 0;
+            normalBias = 0;
+            maxSmoothness = 0;
+            fadeDistance = 0;
+            shadowFadeDistance = 0;
+            shadowResolution = 0;
+            shadowTint = Color.black;
+            penumbraTint = Color.white;
         }
 
         public static LightParameters DeepCopy(LightParameters c)
@@ -178,7 +165,7 @@ namespace LightUtilities
                 intensity = x.intensity + y.intensity,
                 range = x.range + y.range,
                 colorFilter = x.colorFilter + y.colorFilter,
-                useColorTemperature = x.useColorTemperature || y.useColorTemperature ? true : false,
+                useColorTemperature = x.useColorTemperature || y.useColorTemperature,
                 colorTemperature = x.colorTemperature + y.colorTemperature,
                 indirectIntensity = x.indirectIntensity + y.indirectIntensity,
                 emissionRadius = x.emissionRadius + y.emissionRadius,
@@ -187,10 +174,10 @@ namespace LightUtilities
                 maxSmoothness = x.maxSmoothness + y.maxSmoothness,
                 shadowStrength = x.shadowStrength + y.shadowStrength,
                 shadowResolution = x.shadowResolution + y.shadowResolution,
-                shadows = x.shadows || y.shadows ? true : false,
-                affectDiffuse = x.affectDiffuse || y.affectDiffuse ? true : false,
-                affectSpecular = x.affectSpecular || y.affectSpecular ? true : false,
-                contactShadows = x.contactShadows || y.contactShadows ? true : false,
+                shadows = x.shadows || y.shadows,
+                affectDiffuse = x.affectDiffuse || y.affectDiffuse,
+                affectSpecular = x.affectSpecular || y.affectSpecular,
+                contactShadows = x.contactShadows || y.contactShadows,
                 ShadowNearClip = x.ShadowNearClip + y.ShadowNearClip,
                 viewBiasMin = x.viewBiasMin + y.viewBiasMin,
                 viewBiasScale = x.viewBiasScale + y.viewBiasScale,
@@ -272,72 +259,64 @@ namespace LightUtilities
 
     public static class LightingUtilities
     {
+        /// <summary>
+        /// Maps LightShape enums to their corresponding LightType values.
+        /// </summary>
+        private static LightType GetLightTypeFromShape(LightShape shape) => shape switch
+        {
+            LightShape.Point => LightType.Point,
+            LightShape.Spot => LightType.Spot,
+            LightShape.Directional => LightType.Directional,
+            LightShape.Rectangle => LightType.Rectangle,
+            LightShape.Line => LightType.Tube,
+            LightShape.SpotBox => LightType.Box,
+            LightShape.SpotPyramid => LightType.Pyramid,
+            _ => LightType.Point
+        };
 
         public static void ApplyLightParameters(Light light, LightParameters lightParameters)
         {
 #if HDRP
             var additionalLightData = light.gameObject.GetComponent<HDAdditionalLightData>();
+            if (additionalLightData == null)
+                return;
 #endif
 
-            //HD
-            switch (lightParameters.shape)
-            {
-                case LightShape.Point:
-                    light.type = LightType.Point;
-
-                    break;
-                case LightShape.Spot:
-                    light.type = LightType.Spot;
-
-                    break;
-                case LightShape.Directional:
-                    light.type = LightType.Directional;
-
-                    break;
-                case LightShape.SpotBox:
-                    light.type = LightType.Box;
-
-                    break;
-                case LightShape.SpotPyramid:
-                    light.type = LightType.Pyramid;
-
-                    break;
-                case LightShape.Rectangle:
-                    light.type = LightType.Rectangle;
-
-                    break;
-                case LightShape.Line:
-                    light.type = LightType.Tube;
-    
-                    break;
-            }
-            
+            // Apply light shape/type
+            light.type = GetLightTypeFromShape(lightParameters.shape);
 
 #if UNITY_EDITOR
             switch (lightParameters.mode)
             {
-                case LightmapPresetBakeType.Realtime: light.lightmapBakeType = LightmapBakeType.Realtime; break;
-                case LightmapPresetBakeType.Baked: light.lightmapBakeType = LightmapBakeType.Baked; break;
-                case LightmapPresetBakeType.Mixed: light.lightmapBakeType = LightmapBakeType.Mixed; break;
+                case LightmapPresetBakeType.Realtime: 
+                    light.lightmapBakeType = LightmapBakeType.Realtime; 
+                    break;
+                case LightmapPresetBakeType.Baked: 
+                    light.lightmapBakeType = LightmapBakeType.Baked; 
+                    break;
+                case LightmapPresetBakeType.Mixed: 
+                    light.lightmapBakeType = LightmapBakeType.Mixed; 
+                    break;
             }
 #endif
-            if (lightParameters.shadows)
-                light.shadows = LightShadows.Soft;
-            else
-                light.shadows = LightShadows.None;
+            
+            // Apply shadow settings
+            light.shadows = lightParameters.shadows ? LightShadows.Soft : LightShadows.None;
             light.shadowStrength = 1;
             light.shadowNearPlane = lightParameters.ShadowNearClip;
+            
+            // Apply basic light properties
             light.color = lightParameters.colorFilter;
             light.range = lightParameters.range;
             light.spotAngle = lightParameters.lightAngle;
             light.cookie = lightParameters.lightCookie;
             light.cullingMask = lightParameters.cullingMask;
-#if HDRP
-            light.renderingLayerMask = (int)lightParameters.lightLayers;
-#endif
             light.colorTemperature = lightParameters.colorTemperature;
 
 #if HDRP
+            light.renderingLayerMask = (int)lightParameters.lightLayers;
+            
+            // Apply HDRP-specific properties
             additionalLightData.intensity = lightParameters.intensity;
             additionalLightData.shapeRadius = lightParameters.emissionRadius;
             additionalLightData.affectDiffuse = lightParameters.affectDiffuse;
@@ -345,30 +324,29 @@ namespace LightUtilities
             additionalLightData.maxSmoothness = lightParameters.maxSmoothness;
             additionalLightData.fadeDistance = lightParameters.fadeDistance;
             additionalLightData.innerSpotPercent = lightParameters.innerSpotPercent;
-            //additionalLightData.shadowSoftness = lightParameters.shadowSoftness;
             additionalLightData.blockerSampleCount = lightParameters.blockerSampleCount;
             additionalLightData.filterSampleCount = lightParameters.filterSampleCount;
             additionalLightData.minFilterSize = lightParameters.minFilterSize;
-            additionalLightData.shapeWidth = Mathf.Max(lightParameters.width,0.01f);
-            additionalLightData.shapeHeight = Mathf.Max(lightParameters.length,0.01f);
+            additionalLightData.shapeWidth = Mathf.Max(lightParameters.width, 0.01f);
+            additionalLightData.shapeHeight = Mathf.Max(lightParameters.length, 0.01f);
             additionalLightData.areaLightCookie = lightParameters.lightCookie;
             additionalLightData.lightlayersMask = lightParameters.lightLayers;
             additionalLightData.shadowNearPlane = lightParameters.ShadowNearClip;
             additionalLightData.volumetricDimmer = lightParameters.volumetricDimmer;
-
             additionalLightData.shadowFadeDistance = lightParameters.shadowMaxDistance;
-            //additionalLightData.shadowResolution = lightParameters.shadowResolution;
             additionalLightData.shadowDimmer = lightParameters.shadowStrength;
-            //additionalLightData.viewBiasMin = lightParameters.viewBiasMin;
-            //additionalLightData.viewBiasScale = lightParameters.viewBiasScale;
             additionalLightData.normalBias = lightParameters.normalBias;
-            additionalLightData.shadowDimmer = lightParameters.shadowStrength;
-            //additionalLightData.useContactShadow = lightParameters.contactShadows;
             additionalLightData.volumetricShadowDimmer = lightParameters.volumetricShadowDimmer;
             additionalLightData.shadowTint = lightParameters.shadowTint;
             
             //TODO : fix penumbra mode
             //additionalLightData.penumbraTint = lightParameters.penumbraTint;
+            //TODO: Uncomment when available in HDRP
+            //additionalLightData.shadowSoftness = lightParameters.shadowSoftness;
+            //additionalLightData.shadowResolution = lightParameters.shadowResolution;
+            //additionalLightData.viewBiasMin = lightParameters.viewBiasMin;
+            //additionalLightData.viewBiasScale = lightParameters.viewBiasScale;
+            //additionalLightData.useContactShadow = lightParameters.contactShadows;
 #endif
         }
 
@@ -376,6 +354,7 @@ namespace LightUtilities
         {
             var lerpLightParameters = new LightParameters();
 
+            // Interpolate float values
             lerpLightParameters.intensity = Mathf.Lerp(from.intensity, to.intensity, weight);
             lerpLightParameters.indirectIntensity = Mathf.Lerp(from.indirectIntensity, to.indirectIntensity, weight);
             lerpLightParameters.emissionRadius = Mathf.Lerp(from.emissionRadius, to.emissionRadius, weight);
@@ -384,56 +363,56 @@ namespace LightUtilities
             lerpLightParameters.width = Mathf.Lerp(from.width, to.width, weight);
             lerpLightParameters.length = Mathf.Lerp(from.length, to.length, weight);
             lerpLightParameters.cookieSize = Mathf.Lerp(from.cookieSize, to.cookieSize, weight);
-            lerpLightParameters.colorFilter = Color.Lerp(from.colorFilter, to.colorFilter, weight);
             lerpLightParameters.colorTemperature = Mathf.Lerp(from.colorTemperature, to.colorTemperature, weight);
             lerpLightParameters.maxSmoothness = Mathf.Lerp(from.maxSmoothness, to.maxSmoothness, weight);
             lerpLightParameters.innerSpotPercent = Mathf.Lerp(from.innerSpotPercent, to.innerSpotPercent, weight);
-
-            if (from.shadows == false && to.shadows == false)
-            {
-                lerpLightParameters.shadows = false;
-            }
-            else
-            {
-                lerpLightParameters.shadows = true;
-            }
-#if HDRP
-            lerpLightParameters.lightLayers = weight > 0.5f ? to.lightLayers : from.lightLayers;
-#endif
-            lerpLightParameters.useColorTemperature = weight > 0.5f ? to.useColorTemperature : from.useColorTemperature;
-            lerpLightParameters.shape = weight > 0.5f ? to.shape : from.shape;
-            lerpLightParameters.lightCookie = weight > 0.5f ? to.lightCookie : from.lightCookie;
             lerpLightParameters.shadowStrength = Mathf.Lerp(from.shadowStrength, to.shadowStrength, weight);
             lerpLightParameters.viewBiasMin = Mathf.Lerp(from.viewBiasMin, to.viewBiasMin, weight);
             lerpLightParameters.viewBiasScale = Mathf.Lerp(from.viewBiasScale, to.viewBiasScale, weight);
             lerpLightParameters.normalBias = Mathf.Lerp(from.normalBias, to.normalBias, weight);
             lerpLightParameters.ShadowNearClip = Mathf.Lerp(from.ShadowNearClip, to.ShadowNearClip, weight);
             lerpLightParameters.shadowResolution = (int)Mathf.Lerp(from.shadowResolution, to.shadowResolution, weight);
-
-            lerpLightParameters.affectDiffuse = weight > 0.5f ? to.affectDiffuse : from.affectDiffuse;
-            lerpLightParameters.affectSpecular = weight > 0.5f ? to.affectSpecular : from.affectSpecular;
-
-            lerpLightParameters.useVolumetric = weight > 0.5f ? to.useVolumetric : from.useVolumetric;
-            lerpLightParameters.volumetricDimmer = Mathf.Lerp(from.volumetricDimmer, to.volumetricDimmer, weight);
-            lerpLightParameters.volumetricShadowDimmer = Mathf.Lerp(from.volumetricShadowDimmer, to.volumetricShadowDimmer, weight);
-
             lerpLightParameters.shadowSoftness = Mathf.Lerp(from.shadowSoftness, to.shadowSoftness, weight);
             lerpLightParameters.blockerSampleCount = (int)Mathf.Lerp(from.blockerSampleCount, to.blockerSampleCount, weight);
             lerpLightParameters.filterSampleCount = (int)Mathf.Lerp(from.filterSampleCount, to.filterSampleCount, weight);
             lerpLightParameters.minFilterSize = Mathf.Lerp(from.minFilterSize, to.minFilterSize, weight);
-            lerpLightParameters.contactShadows = weight > 0.5f ? to.contactShadows : from.contactShadows;
+            lerpLightParameters.volumetricDimmer = Mathf.Lerp(from.volumetricDimmer, to.volumetricDimmer, weight);
+            lerpLightParameters.volumetricShadowDimmer = Mathf.Lerp(from.volumetricShadowDimmer, to.volumetricShadowDimmer, weight);
 
+            // Interpolate color values
+            lerpLightParameters.colorFilter = Color.Lerp(from.colorFilter, to.colorFilter, weight);
+            LerpColorComponent(ref lerpLightParameters.shadowTint, from.shadowTint, to.shadowTint, weight);
+            LerpColorComponent(ref lerpLightParameters.penumbraTint, from.penumbraTint, to.penumbraTint, weight);
+
+            // Threshold-based interpolation (discrete values)
+            lerpLightParameters.shadows = (from.shadows == false && to.shadows == false) ? false : true;
+            lerpLightParameters.useColorTemperature = weight > 0.5f ? to.useColorTemperature : from.useColorTemperature;
+            lerpLightParameters.shape = weight > 0.5f ? to.shape : from.shape;
+            lerpLightParameters.lightCookie = weight > 0.5f ? to.lightCookie : from.lightCookie;
+            lerpLightParameters.affectDiffuse = weight > 0.5f ? to.affectDiffuse : from.affectDiffuse;
+            lerpLightParameters.affectSpecular = weight > 0.5f ? to.affectSpecular : from.affectSpecular;
+            lerpLightParameters.useVolumetric = weight > 0.5f ? to.useVolumetric : from.useVolumetric;
+            lerpLightParameters.contactShadows = weight > 0.5f ? to.contactShadows : from.contactShadows;
             lerpLightParameters.cullingMask = weight > 0.5f ? to.cullingMask : from.cullingMask;
             lerpLightParameters.shadowQuality = weight > 0.5f ? to.shadowQuality : from.shadowQuality;
 
-            lerpLightParameters.shadowTint.r = Mathf.Lerp(from.shadowTint.r, to.shadowTint.r, weight);
-            lerpLightParameters.shadowTint.g = Mathf.Lerp(from.shadowTint.g, to.shadowTint.g, weight);
-            lerpLightParameters.shadowTint.b = Mathf.Lerp(from.shadowTint.b, to.shadowTint.b, weight);
-            lerpLightParameters.penumbraTint.r = Mathf.Lerp(from.penumbraTint.r, to.penumbraTint.r, weight);
-            lerpLightParameters.penumbraTint.g = Mathf.Lerp(from.penumbraTint.g, to.penumbraTint.g, weight);
-            lerpLightParameters.penumbraTint.b = Mathf.Lerp(from.penumbraTint.b, to.penumbraTint.b, weight);
+#if HDRP
+            lerpLightParameters.lightLayers = weight > 0.5f ? to.lightLayers : from.lightLayers;
+#endif
 
             return lerpLightParameters;
+        }
+
+        /// <summary>
+        /// Helper method to interpolate color components efficiently.
+        /// </summary>
+        private static void LerpColorComponent(ref Color target, Color from, Color to, float weight)
+        {
+            target = new Color(
+                Mathf.Lerp(from.r, to.r, weight),
+                Mathf.Lerp(from.g, to.g, weight),
+                Mathf.Lerp(from.b, to.b, weight)
+            );
         }
     }
 }
